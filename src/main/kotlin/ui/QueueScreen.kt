@@ -7,30 +7,30 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import datastructures.CustomQueue
+import utils.countVowelsAndConsonants
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QueueScreen(queue: CustomQueue<String>) {
-
+fun VowelConsonantScreen() {
     var inputText by remember { mutableStateOf("") }
+    var result by remember { mutableStateOf<Pair<Int, Int>?>(null) }
     var isPopupVisible by remember { mutableStateOf(false) }
 
-
-    Column(Modifier.padding(16.dp)) {
+    Column(modifier = Modifier.padding(16.dp)) {
         Text(
-            "Queue",
+            "Vowels & Consonants",
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onBackground
         )
+
         DropdownMenu(
             expanded = isPopupVisible,
             onDismissRequest = { isPopupVisible = false },
             modifier = Modifier.padding(16.dp)
         ) {
-            Text("What is a Queue?", style = MaterialTheme.typography.bodyMedium)
+            Text("What does this do?", style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.height(8.dp))
-            Text("A Queue Data Structure is a fundamental concept in computer science used for storing and managing data in a specific order. It follows the principle of \"First in, First out\" (FIFO), where the first element added to the queue is the first one to be removed.")
+            Text("This tool counts how many vowels and consonants are present in your input. Only alphabetic characters are considered.")
         }
 
         ExtendedFloatingActionButton(
@@ -39,48 +39,28 @@ fun QueueScreen(queue: CustomQueue<String>) {
             onClick = { isPopupVisible = !isPopupVisible }
         )
 
+        Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = inputText,
             onValueChange = { inputText = it },
-            label = { Text("Enter element") },
-            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Enter text") },
+            modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Button(onClick = {
-                if (inputText.isNotBlank()) {
-                    queue.enqueue(inputText)
-                }
-                inputText = ""
-            }) {
-                Text("Enqueue")
-            }
-
-            Button(onClick = { queue.dequeue() }) {
-                Text("Dequeue")
-            }
-
-            Button(onClick = { while (!queue.isEmpty()) queue.dequeue() }) {
-                Text("Clear")
-            }
+        Button(onClick = {
+            result = countVowelsAndConsonants(inputText)
+        }) {
+            Text("Count")
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        Text("Queue Size: ${queue.size()}")
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text("Queue Elements:")
-        Spacer(modifier = Modifier.height(8.dp))
-
-        for (i in 0 until queue.size()) {
-            queue.peek(i)?.let { Text(it) }
+        result?.let {
+            Text("Vowels: ${it.first}")
+            Text("Consonants: ${it.second}")
         }
     }
 }
